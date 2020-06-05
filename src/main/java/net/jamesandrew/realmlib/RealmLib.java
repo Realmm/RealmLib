@@ -11,7 +11,7 @@ import net.jamesandrew.realmlib.inventory.hotbar.IconDropListener;
 import net.jamesandrew.realmlib.register.Register;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public abstract class RealmLib extends JavaPlugin{
+public abstract class RealmLib extends JavaPlugin {
 
     private final String toPrint = "\nDeveloped by Realm\nSpigot profile: https://www.spigotmc.org/members/realm.86904/\n";
 
@@ -28,6 +28,7 @@ public abstract class RealmLib extends JavaPlugin{
         Register.listener(new HotBarInteractListener(), this);
         Register.listener(new HotBarIconMoveListener(), this);
         Register.listener(new HotBarBlockPlaceListener(), this);
+
         onStart();
     }
 

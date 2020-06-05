@@ -2,8 +2,10 @@ package net.jamesandrew.realmlib.register;
 
 import net.jamesandrew.realmlib.command.BaseCommand;
 import net.jamesandrew.realmlib.command.CommandManager;
+import net.jamesandrew.realmlib.placeholder.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
@@ -21,6 +23,15 @@ public final class Register {
 
     public static void baseCommand(BaseCommand baseCommand) {
         CommandManager.register(baseCommand);
+    }
+
+    public static void callEvent(Event e) {
+        Bukkit.getPluginManager().callEvent(e);
+    }
+
+    public static void placeholderExpansion(PlaceholderExpansion e) {
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) throw new IllegalArgumentException("Tried to register placeholder expansion while not having installed PlaceholderAPI jar");
+        e.register();
     }
 
 }
