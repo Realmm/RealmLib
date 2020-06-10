@@ -1,6 +1,9 @@
 package net.jamesandrew.realmlib.lang;
 
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
+
+import java.util.List;
 
 public final class Lang {
 
@@ -12,6 +15,20 @@ public final class Lang {
 
     public static String stripColor(String s) {
         return ChatColor.stripColor(s);
+    }
+
+    public static String translateString(FileConfiguration file, String path) {
+        StringBuilder sb = new StringBuilder();
+
+        if (file.isList(path)) {
+            List<String> list = file.getStringList(path);
+            for (int i = 0; i < list.size(); i++) {
+                sb.append(color(list.get(i)));
+                if (i != list.size() - 1) sb.append("\n");
+            }
+        } else sb.append(color(file.getString(path)));
+
+        return sb.toString();
     }
 
 }
