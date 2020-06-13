@@ -1,5 +1,6 @@
 package net.jamesandrew.realmlib.register;
 
+import net.jamesandrew.realmlib.RealmLib;
 import net.jamesandrew.realmlib.command.BaseCommand;
 import net.jamesandrew.realmlib.command.CommandManager;
 import org.bukkit.Bukkit;
@@ -13,7 +14,7 @@ public final class Register {
     private Register(){}
 
     public static void command(CommandExecutor commandExecutor, String command) {
-        Bukkit.getPluginCommand(command).setExecutor(commandExecutor);
+        RealmLib.get().getCommand(command).setExecutor(commandExecutor);
     }
 
     public static void listener(Listener listener, Plugin plugin) {
