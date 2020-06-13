@@ -50,7 +50,7 @@ public abstract class RealmLib extends JavaPlugin {
         return JavaPlugin.getPlugin(RealmLib.class);
     }
 
-    void setShouldEnablePrint(boolean enable) {
+    protected void setShouldEnablePrint(boolean enable) {
         this.enable = enable;
     }
 
