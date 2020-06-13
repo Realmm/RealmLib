@@ -84,8 +84,8 @@ public abstract class CommandNode implements CommandExecutionable {
         chain.clear();
     }
 
-    public Collection<SubCommand> getChildren() {
-        return Collections.unmodifiableCollection(subCommands);
+    public Set<SubCommand> getChildren() {
+        return Collections.unmodifiableSet(subCommands);
     }
 
     public void addSubCommands(SubCommand... subCommands) {

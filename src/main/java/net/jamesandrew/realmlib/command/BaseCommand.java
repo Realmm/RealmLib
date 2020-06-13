@@ -1,16 +1,16 @@
 package net.jamesandrew.realmlib.command;
 
-import java.util.*;
-
 import net.jamesandrew.commons.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 
+import java.util.*;
+
 public class BaseCommand extends CommandNode {
 
     private final CommandManager manager = new CommandManager();
-    private Set<String> alias = new HashSet<>();
+    private final Set<String> alias = new HashSet<>();
 
     public BaseCommand(String command, CommandExecution execution) {
         super(command, execution);

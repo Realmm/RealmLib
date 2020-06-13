@@ -14,9 +14,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 public abstract class RealmLib extends JavaPlugin {
 
     private final String toPrint = "\nDeveloped by Realm\nSpigot profile: https://www.spigotmc.org/members/realm.86904/\n";
+    private boolean enable = true;
 
     @Override
     public void onEnable() {
+        onPreStart();
         printEnable(getName());
 
         Logger.setLogger(getLogger() == null ? java.util.logging.Logger.getLogger("RealmLibLogger") : getLogger());
@@ -38,15 +40,22 @@ public abstract class RealmLib extends JavaPlugin {
         onEnd();
     }
 
-    public abstract void onStart();
+    abstract void onStart();
 
-    public abstract void onEnd();
+    abstract void onEnd();
+
+    void onPreStart() {}
 
     public static JavaPlugin get() {
         return JavaPlugin.getPlugin(RealmLib.class);
     }
 
+    void setShouldEnablePrint(boolean enable) {
+        this.enable = enable;
+    }
+
     private void printEnable(String name) {
+        if (!enable) return;
         try {
             Reflect.getClassesExtending(RealmLib.class).forEach(c ->
                     Logger.log("\n\nInitialising... " + c.getSimpleName() + " (" + c.getCanonicalName() + ")" + toPrint));
@@ -57,6 +66,7 @@ public abstract class RealmLib extends JavaPlugin {
     }
 
     private void printDisable(String name) {
+        if (!enable) return;
         try {
             Reflect.getClassesExtending(RealmLib.class).forEach(c -> Logger.log("\n\nClosing... " + c.getSimpleName() + " (" + c.getCanonicalName() + ")" + toPrint));
         } catch (NoSuchMethodError e) {
