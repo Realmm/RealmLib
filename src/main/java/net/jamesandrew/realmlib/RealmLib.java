@@ -40,11 +40,11 @@ public abstract class RealmLib extends JavaPlugin {
         onEnd();
     }
 
-    abstract void onStart();
+    protected abstract void onStart();
 
-    abstract void onEnd();
+    protected abstract void onEnd();
 
-    void onPreStart() {}
+    protected void onPreStart() {}
 
     public static JavaPlugin get() {
         return JavaPlugin.getPlugin(RealmLib.class);
