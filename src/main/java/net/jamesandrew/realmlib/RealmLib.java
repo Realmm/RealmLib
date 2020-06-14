@@ -2,14 +2,17 @@ package net.jamesandrew.realmlib;
 
 import net.jamesandrew.commons.logging.Logger;
 import net.jamesandrew.commons.reflection.Reflect;
-import net.jamesandrew.realmlib.concurrency.Task;
 import net.jamesandrew.realmlib.inventory.InventoryListener;
 import net.jamesandrew.realmlib.inventory.hotbar.HotBarBlockPlaceListener;
 import net.jamesandrew.realmlib.inventory.hotbar.HotBarIconMoveListener;
 import net.jamesandrew.realmlib.inventory.hotbar.HotBarInteractListener;
 import net.jamesandrew.realmlib.inventory.hotbar.IconDropListener;
-import net.jamesandrew.realmlib.register.Register;
+import net.jamesandrew.realmlib.util.nms.MaxStackSizeInventoryClickListener;
+import net.jamesandrew.realmlib.util.concurrency.Task;
+import net.jamesandrew.realmlib.util.register.Register;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.stream.Stream;
 
 public abstract class RealmLib extends JavaPlugin {
 
@@ -25,11 +28,7 @@ public abstract class RealmLib extends JavaPlugin {
 
         Task.setTaskChainFactory(this);
 
-        Register.listener(new IconDropListener(), this);
-        Register.listener(new InventoryListener(), this);
-        Register.listener(new HotBarInteractListener(), this);
-        Register.listener(new HotBarIconMoveListener(), this);
-        Register.listener(new HotBarBlockPlaceListener(), this);
+        registerListers();
 
         onStart();
     }
@@ -73,6 +72,17 @@ public abstract class RealmLib extends JavaPlugin {
             Logger.log("\n\nClosing... " + name + " (" + getClass().getCanonicalName() + ")" + toPrint);
         }
 
+    }
+
+    private void registerListers() {
+        Stream.of(
+                new IconDropListener(),
+                new InventoryListener(),
+                new HotBarInteractListener(),
+                new HotBarIconMoveListener(),
+                new HotBarBlockPlaceListener(),
+                new MaxStackSizeInventoryClickListener()
+        ).forEach(l -> Register.listener(l, this));
     }
 
 }

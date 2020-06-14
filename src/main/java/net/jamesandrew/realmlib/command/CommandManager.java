@@ -1,7 +1,7 @@
 package net.jamesandrew.realmlib.command;
 
 import net.jamesandrew.commons.exception.Validator;
-import net.jamesandrew.realmlib.register.Register;
+import net.jamesandrew.realmlib.util.register.Register;
 import org.apache.commons.lang.Validate;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
