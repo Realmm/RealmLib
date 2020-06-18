@@ -7,7 +7,7 @@ import net.jamesandrew.realmlib.inventory.hotbar.HotBarBlockPlaceListener;
 import net.jamesandrew.realmlib.inventory.hotbar.HotBarIconMoveListener;
 import net.jamesandrew.realmlib.inventory.hotbar.HotBarInteractListener;
 import net.jamesandrew.realmlib.inventory.hotbar.IconDropListener;
-import net.jamesandrew.realmlib.util.nms.MaxStackSizeInventoryClickListener;
+import net.jamesandrew.realmlib.util.item.MaxStackSizeInventoryClickListener;
 import net.jamesandrew.realmlib.util.concurrency.Task;
 import net.jamesandrew.realmlib.util.register.Register;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,7 +28,7 @@ public abstract class RealmLib extends JavaPlugin {
 
         Task.setTaskChainFactory(this);
 
-        registerListers();
+        registerListeners();
 
         onStart();
     }
@@ -74,7 +74,7 @@ public abstract class RealmLib extends JavaPlugin {
 
     }
 
-    private void registerListers() {
+    private void registerListeners() {
         Stream.of(
                 new IconDropListener(),
                 new InventoryListener(),

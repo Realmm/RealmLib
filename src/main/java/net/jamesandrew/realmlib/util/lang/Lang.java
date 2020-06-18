@@ -35,6 +35,10 @@ public final class Lang {
         return sb.toString();
     }
 
+    public static boolean isColored(String s) {
+        return s.contains(ChatColor.COLOR_CHAR + "([0-fk-or])");
+    }
+
     public static TextComponent toTextComponent(String s, HoverEvent h, ClickEvent c) {
         TextComponent t = new TextComponent(s);
         t.setClickEvent(c);
