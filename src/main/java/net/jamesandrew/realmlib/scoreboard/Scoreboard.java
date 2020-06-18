@@ -1,5 +1,6 @@
 package net.jamesandrew.realmlib.scoreboard;
 
+import net.jamesandrew.commons.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -199,6 +200,7 @@ public class Scoreboard {
 
         //Get the final sorted set and loop through it
         getFinalSet().forEach((i, e) -> {
+            Logger.debug("e: " + e.execute(p));
             if (!oldExecutions.isEmpty() && oldExecutions.containsKey(i) && oldExecutions.get(i).execute(p).equals(e.execute(p))) return;
             //Find the team for this index (cached on instantiation)
             ScoreboardTeam sbTeam = teams.stream().filter(s -> s.getIndex() == i).findFirst().orElseThrow(() -> new IllegalArgumentException("No team with index " + i));
@@ -216,12 +218,15 @@ public class Scoreboard {
                     toAdd = StringUtils.substring(toAdd, 0, 30);
                 }
 
-                String prefix = StringUtils.substring(toAdd, 0, 16);
+                String sub = StringUtils.substring(toAdd, 0, 16);
+                char splitCode = sub.charAt(sub.length() - 1);
+                boolean codeSplit = splitCode == ChatColor.COLOR_CHAR;
+                String prefix = StringUtils.substring(toAdd, 0, codeSplit ? 15 : 16);
                 String lastColor = ChatColor.getLastColors(prefix).equals("") ? ChatColor.RESET.toString() : ChatColor.getLastColors(prefix);
-                String suffix = StringUtils.substring(toAdd, 16, 30);
+                String suffix = StringUtils.substring(toAdd, codeSplit ? 15 : 16, codeSplit ? 31 : 30);
 
                 team.setPrefix(prefix);
-                team.setSuffix(lastColor + suffix);
+                team.setSuffix(codeSplit ? suffix : lastColor + suffix);
             }
 
             //Updates the objective with the appropriate score and entry
