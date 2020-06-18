@@ -81,6 +81,7 @@ public class Scoreboard {
 
     /**
      * Add a line to the scoreboard
+     * Maximum amount of lines a scoreboard can have is 15
      * @param s The content of the line to add
      */
     public void addLine(String s) {
@@ -89,7 +90,7 @@ public class Scoreboard {
 
     /**
      * Add a {@link LineExecution} line to the scoreboard
-     * Maximum amount of lines a scoreboard can have is 16
+     * Maximum amount of lines a scoreboard can have is 15
      * @param execution The {@link LineExecution} to add
      */
     public void addLine(LineExecution execution) {
@@ -108,13 +109,13 @@ public class Scoreboard {
      * Set a specific line on a scoreboard
      * Appends to bottom of scoreboard if the index is higher than the amount of lines
      * If, after using this method, you add more lines, this line will retain its index
-     * Maximum amount of lines a scoreboard can have is 16
+     * Maximum amount of lines a scoreboard can have is 15
      * @param index The line number that you want to set
      * @param execution The {@link LineExecution} you want to set the line to
      * @param append Whether it should append to the bottom of scoreboard, if it can
      */
     public void setLine(int index, LineExecution execution, boolean append) {
-        if (index > 16 || index <= 0) throw new IndexOutOfBoundsException("Line index out of bounds (1-16), line attempted to be set at '" + index + "'");
+        if (index > maxLines || index <= 0) throw new IndexOutOfBoundsException("Line index out of bounds (1-15), line attempted to be set at '" + index + "'");
         if (getFinalSet().size() >= maxLines) throw new IndexOutOfBoundsException("You cannot add more than 15 lines.");
         setExecutions.add(new SetExecution(index, execution, append));
     }
@@ -123,6 +124,7 @@ public class Scoreboard {
      * Set a specific line on a scoreboard
      * Appends to bottom of scoreboard if the index is higher than the amount of lines
      * If, after using this method, you add more lines, this line will retain its index
+     * Maximum amount of lines a scoreboard can have is 15
      * @param index The line number that you want to set
      * @param s The content of the line that you want to set
      * @param append Whether it should append to the bottom of scoreboard, if it can
@@ -135,6 +137,7 @@ public class Scoreboard {
      * Set a specific line on a scoreboard
      * Appends to bottom of scoreboard if the index is higher than the amount of lines
      * If, after using this method, you add more lines, this line will retain its index
+     * Maximum amount of lines a scoreboard can have is 15
      * @param index The line number that you want to set
      * @param s The content of the line that you want to set
      */
@@ -146,6 +149,7 @@ public class Scoreboard {
      * Set a specific line on a scoreboard
      * Appends to bottom of scoreboard if the index is higher than the amount of lines
      * If, after using this method, you add more lines, this line will retain its index
+     * Maximum amount of lines a scoreboard can have is 15
      * @param index The line number that you want to set
      * @param execution The {@link LineExecution} you want to set the line to
      */
