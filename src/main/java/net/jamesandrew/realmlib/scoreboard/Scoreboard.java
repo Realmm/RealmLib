@@ -1,9 +1,13 @@
 package net.jamesandrew.realmlib.scoreboard;
 
+import net.jamesandrew.commons.number.Number;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
@@ -16,12 +20,16 @@ public class Scoreboard {
     private final int maxLines = 15;
 
     private final org.bukkit.scoreboard.Scoreboard scoreboard;
-    private final Objective objective;
+    private Objective objective;
+    private Objective buffer;
 
     private LineExecution title;
 
     private final Map<Integer, LineExecution> executions = new HashMap<>();
     private final Set<SetExecution> setExecutions = new HashSet<>();
+    private final Set<ScoreboardTeam> teams = new HashSet<>();
+//    private final Map<Integer, Team> teams = new HashMap<>();
+//    private final Map<>
 
     /**
      * Create a scoreboard with a certain title
@@ -57,9 +65,19 @@ public class Scoreboard {
      */
     public Scoreboard(String title, List<LineExecution> lines) {
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        objective = scoreboard.registerNewObjective("dummy", title);
+
+        objective = scoreboard.registerNewObjective("obj", "dummy");
         objective.setDisplayName(title);
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+        buffer = scoreboard.registerNewObjective("buffer", "dummy");
+
+        for (int i = 0; i < 16; i++) {
+            Team t = scoreboard.registerNewTeam(String.valueOf(i));
+            String entry = String.valueOf(ChatColor.values()[i]);
+            teams.add(new ScoreboardTeam(i, t, entry));
+        }
+
         lines.forEach(this::addToExecution);
     }
 
@@ -102,7 +120,13 @@ public class Scoreboard {
      * Adds a blank line to the scoreboard
      */
     public void addBlankLine() {
-        addLine("");
+        StringBuilder sb = new StringBuilder();
+        LineExecution execution = p -> "";
+        while(executions.containsValue(execution)) {
+            sb.append(" ");
+            execution = p -> sb.toString();
+        }
+        addLine(execution);
     }
 
     /**
@@ -117,6 +141,7 @@ public class Scoreboard {
     public void setLine(int index, LineExecution execution, boolean append) {
         if (index > maxLines || index <= 0) throw new IndexOutOfBoundsException("Line index out of bounds (1-15), line attempted to be set at '" + index + "'");
         if (getFinalSet().size() >= maxLines) throw new IndexOutOfBoundsException("You cannot add more than 15 lines.");
+        setExecutions.removeIf(e -> e.getIndex() == index);
         setExecutions.add(new SetExecution(index, execution, append));
     }
 
@@ -158,6 +183,14 @@ public class Scoreboard {
     }
 
     /**
+     * Removes the scoreboard from the {@link Player}
+     * @param p The {@link Player} to remove the scoreboard from
+     */
+    public void remove(Player p) {
+        p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+    }
+
+    /**
      * Updates a players scoreboard with the updated values
      * This also applies the scoreboard to the player if they don't have one
      * This should be called after modifying the scoreboard in any way
@@ -169,10 +202,115 @@ public class Scoreboard {
         //Updates players title if it can
         if (title != null) objective.setDisplayName(title.execute(p));
 
-        //Sets all the scores on the scoreboard to their appropriate value
-        getFinalSet().forEach((i, e) -> objective.getScore(e.execute(p)).setScore(i));
+        //Sets all the scores in the buffer objective to their appropriate value
+        getFinalSet().forEach((i, e) -> {
+            ScoreboardTeam sbTeam = teams.stream().filter(s -> s.getIndex() == i).findFirst().orElseThrow(() -> new IllegalArgumentException("No team with index " + i));
+            Team team = sbTeam.getTeam();
+            String entry = sbTeam.getEntry();
+            team.addEntry(entry);
 
-        //Sets the scoreboard to the player
+            String toAdd = e.execute(p);
+
+            if (toAdd.length() <= 16) {
+                team.setPrefix(toAdd);
+            } else {
+                if (toAdd.length() > 30) {
+                    toAdd = StringUtils.substring(toAdd, 0, 30);
+                }
+
+                String prefix = StringUtils.substring(toAdd, 0, 16);
+                String lastColor = ChatColor.getLastColors(prefix).equals("") ? ChatColor.RESET.toString() : ChatColor.getLastColors(prefix);
+
+                String suffix = StringUtils.substring(toAdd, 16, 30);
+
+                team.setPrefix(prefix);
+                team.setSuffix(lastColor + suffix);
+            }
+
+            objective.getScore(entry).setScore(i);
+        });
+
+        p.setScoreboard(scoreboard);
+    }
+
+    public void updateTeamsAndBuffered(Player p) {
+        if (executions.size() == 0) return;
+
+        //Updates players title if it can
+        if (title != null) buffer.setDisplayName(title.execute(p));
+
+        //Sets all the scores in the buffer objective to their appropriate value
+        getFinalSet().forEach((i, e) -> {
+            ScoreboardTeam sbTeam = teams.stream().filter(s -> s.getIndex() == i).findFirst().orElseThrow(() -> new IllegalArgumentException("No team with index " + i));
+            Team team = sbTeam.getTeam();
+            String entry = sbTeam.getEntry();
+            team.addEntry(entry);
+
+            String toAdd = e.execute(p);
+
+            if (toAdd.length() <= 16) {
+                team.setPrefix(toAdd);
+            } else {
+                if (toAdd.length() > 30) {
+                    toAdd = StringUtils.substring(toAdd, 0, 30);
+                }
+
+                String prefix = StringUtils.substring(toAdd, 0, 16);
+                String lastColor = ChatColor.getLastColors(prefix).equals("") ? ChatColor.RESET.toString() : ChatColor.getLastColors(prefix);
+
+                String suffix = StringUtils.substring(toAdd, 16, 30);
+
+                team.setPrefix(prefix);
+                team.setSuffix(lastColor + suffix);
+            }
+
+            buffer.getScore(entry).setScore(i);
+        });
+
+        //Saves references to old objective name and criteria
+        String objName = objective.getName();
+        String criteria = objective.getCriteria();
+
+        buffer.setDisplaySlot(objective.getDisplaySlot());
+
+        //Swaps references to objective and buffer
+        Objective o = objective;
+        objective = buffer; //objective equals newly updated buffer
+        buffer = o; //buffer equals OLD objective
+
+        //Unregisters and clears old 'objective' objective
+        buffer.unregister();
+        //Creates new objective with old objectives name and criteria
+        buffer = scoreboard.registerNewObjective(objName, criteria);
+
+        p.setScoreboard(scoreboard);
+    }
+
+    public void updateBuffered(Player p) {
+        if (executions.size() == 0) return;
+
+        //Updates players title if it can
+        if (title != null) buffer.setDisplayName(title.execute(p));
+
+        //Sets all the scores in the buffer objective to their appropriate value
+        getFinalSet().forEach((i, e) -> buffer.getScore(e.execute(p)).setScore(i));
+
+        //Saves references to old objective name and criteria
+        String objName = objective.getName();
+        String criteria = objective.getCriteria();
+
+        buffer.setDisplaySlot(objective.getDisplaySlot());
+
+        //Swaps references to objective and buffer
+        Objective o = objective;
+        objective = buffer; //objective equals newly updated buffer
+        buffer = o; //buffer equals OLD objective
+
+        //Unregisters and clears old 'objective' objective
+        buffer.unregister();
+        //Creates new objective with old objectives name and criteria
+        buffer = scoreboard.registerNewObjective(objName, criteria);
+
         p.setScoreboard(scoreboard);
     }
 
@@ -189,6 +327,20 @@ public class Scoreboard {
     private void addToExecution(LineExecution execution) {
         int next = executions.keySet().stream().reduce((i, ii) -> i > ii ? i : ii).orElse(-1) + 1;
         executions.put(next, execution);
+    }
+
+    private String getUniqueEntry() {
+        String[] random = {getRandomColor() + "" + getRandomColor()};
+
+        while(scoreboard.getTeams().stream().anyMatch(t -> t.getEntries().stream().anyMatch(e -> e.equals(random[0])))) {
+            random[0] = getRandomColor() + "" + getRandomColor();
+        }
+
+        return random[0];
+    }
+
+    private ChatColor getRandomColor() {
+        return ChatColor.values()[(int) Number.getRandom(1, ChatColor.values().length - 1)];
     }
 
     private Map<Integer, LineExecution> getFinalSet() {
@@ -224,7 +376,7 @@ public class Scoreboard {
         Map<Integer, LineExecution> finalToSet = new HashMap<>();
 
         //If there are any 'set' lines to append to the bottom of the scoreboard, this
-        // pushes increases all lines already to go onto the scoreboard by how many it should
+        // increases all lines already to go onto the scoreboard by how many it should
         // append by, to make room for the appending lines
         reversed.forEach((i, e) -> finalToSet.put(i + toAppend.size(), e));
 

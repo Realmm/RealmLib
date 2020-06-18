@@ -19,6 +19,7 @@ net\jamesandrew\realmlib\command\CommandExecution.class
 net\jamesandrew\realmlib\bungeecord\BungeeChannel.class
 net\jamesandrew\realmlib\inventory\MenuIcon.class
 net\jamesandrew\realmlib\command\BaseCommand.class
+net\jamesandrew\realmlib\scoreboard\ScoreboardTeam.class
 net\jamesandrew\realmlib\inventory\PaginatorManager.class
 net\jamesandrew\realmlib\concurrency\Task.class
 net\jamesandrew\realmlib\lang\Text.class
