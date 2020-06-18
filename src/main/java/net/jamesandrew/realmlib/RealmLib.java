@@ -7,9 +7,9 @@ import net.jamesandrew.realmlib.inventory.hotbar.HotBarBlockPlaceListener;
 import net.jamesandrew.realmlib.inventory.hotbar.HotBarIconMoveListener;
 import net.jamesandrew.realmlib.inventory.hotbar.HotBarInteractListener;
 import net.jamesandrew.realmlib.inventory.hotbar.IconDropListener;
-import net.jamesandrew.realmlib.util.item.MaxStackSizeInventoryClickListener;
-import net.jamesandrew.realmlib.util.concurrency.Task;
-import net.jamesandrew.realmlib.util.register.Register;
+import net.jamesandrew.realmlib.item.MaxStackSizeInventoryClickListener;
+import net.jamesandrew.realmlib.concurrency.Task;
+import net.jamesandrew.realmlib.register.Register;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.stream.Stream;
