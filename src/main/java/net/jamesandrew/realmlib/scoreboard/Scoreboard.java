@@ -1,6 +1,5 @@
 package net.jamesandrew.realmlib.scoreboard;
 
-import net.jamesandrew.commons.number.Number;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,16 +19,13 @@ public class Scoreboard {
     private final int maxLines = 15;
 
     private final org.bukkit.scoreboard.Scoreboard scoreboard;
-    private Objective objective;
-    private Objective buffer;
+    private final Objective objective;
 
     private LineExecution title;
 
     private final Map<Integer, LineExecution> executions = new HashMap<>();
     private final Set<SetExecution> setExecutions = new HashSet<>();
     private final Set<ScoreboardTeam> teams = new HashSet<>();
-//    private final Map<Integer, Team> teams = new HashMap<>();
-//    private final Map<>
 
     /**
      * Create a scoreboard with a certain title
@@ -69,8 +65,6 @@ public class Scoreboard {
         objective = scoreboard.registerNewObjective("obj", "dummy");
         objective.setDisplayName(title);
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-
-        buffer = scoreboard.registerNewObjective("buffer", "dummy");
 
         for (int i = 0; i < 16; i++) {
             Team t = scoreboard.registerNewTeam(String.valueOf(i));
@@ -202,8 +196,9 @@ public class Scoreboard {
         //Updates players title if it can
         if (title != null) objective.setDisplayName(title.execute(p));
 
-        //Sets all the scores in the buffer objective to their appropriate value
+        //Get the final sorted set and loop through it
         getFinalSet().forEach((i, e) -> {
+            //Find the team for this index (cached on instantiation)
             ScoreboardTeam sbTeam = teams.stream().filter(s -> s.getIndex() == i).findFirst().orElseThrow(() -> new IllegalArgumentException("No team with index " + i));
             Team team = sbTeam.getTeam();
             String entry = sbTeam.getEntry();
@@ -211,6 +206,7 @@ public class Scoreboard {
 
             String toAdd = e.execute(p);
 
+            //Splits the line in half, sets the first half as prefix, second half as suffix, of the appropriate team
             if (toAdd.length() <= 16) {
                 team.setPrefix(toAdd);
             } else {
@@ -220,97 +216,17 @@ public class Scoreboard {
 
                 String prefix = StringUtils.substring(toAdd, 0, 16);
                 String lastColor = ChatColor.getLastColors(prefix).equals("") ? ChatColor.RESET.toString() : ChatColor.getLastColors(prefix);
-
                 String suffix = StringUtils.substring(toAdd, 16, 30);
 
                 team.setPrefix(prefix);
                 team.setSuffix(lastColor + suffix);
             }
 
+            //Updates the objective with the appropriate score and entry
             objective.getScore(entry).setScore(i);
         });
 
-        p.setScoreboard(scoreboard);
-    }
-
-    public void updateTeamsAndBuffered(Player p) {
-        if (executions.size() == 0) return;
-
-        //Updates players title if it can
-        if (title != null) buffer.setDisplayName(title.execute(p));
-
-        //Sets all the scores in the buffer objective to their appropriate value
-        getFinalSet().forEach((i, e) -> {
-            ScoreboardTeam sbTeam = teams.stream().filter(s -> s.getIndex() == i).findFirst().orElseThrow(() -> new IllegalArgumentException("No team with index " + i));
-            Team team = sbTeam.getTeam();
-            String entry = sbTeam.getEntry();
-            team.addEntry(entry);
-
-            String toAdd = e.execute(p);
-
-            if (toAdd.length() <= 16) {
-                team.setPrefix(toAdd);
-            } else {
-                if (toAdd.length() > 30) {
-                    toAdd = StringUtils.substring(toAdd, 0, 30);
-                }
-
-                String prefix = StringUtils.substring(toAdd, 0, 16);
-                String lastColor = ChatColor.getLastColors(prefix).equals("") ? ChatColor.RESET.toString() : ChatColor.getLastColors(prefix);
-
-                String suffix = StringUtils.substring(toAdd, 16, 30);
-
-                team.setPrefix(prefix);
-                team.setSuffix(lastColor + suffix);
-            }
-
-            buffer.getScore(entry).setScore(i);
-        });
-
-        //Saves references to old objective name and criteria
-        String objName = objective.getName();
-        String criteria = objective.getCriteria();
-
-        buffer.setDisplaySlot(objective.getDisplaySlot());
-
-        //Swaps references to objective and buffer
-        Objective o = objective;
-        objective = buffer; //objective equals newly updated buffer
-        buffer = o; //buffer equals OLD objective
-
-        //Unregisters and clears old 'objective' objective
-        buffer.unregister();
-        //Creates new objective with old objectives name and criteria
-        buffer = scoreboard.registerNewObjective(objName, criteria);
-
-        p.setScoreboard(scoreboard);
-    }
-
-    public void updateBuffered(Player p) {
-        if (executions.size() == 0) return;
-
-        //Updates players title if it can
-        if (title != null) buffer.setDisplayName(title.execute(p));
-
-        //Sets all the scores in the buffer objective to their appropriate value
-        getFinalSet().forEach((i, e) -> buffer.getScore(e.execute(p)).setScore(i));
-
-        //Saves references to old objective name and criteria
-        String objName = objective.getName();
-        String criteria = objective.getCriteria();
-
-        buffer.setDisplaySlot(objective.getDisplaySlot());
-
-        //Swaps references to objective and buffer
-        Objective o = objective;
-        objective = buffer; //objective equals newly updated buffer
-        buffer = o; //buffer equals OLD objective
-
-        //Unregisters and clears old 'objective' objective
-        buffer.unregister();
-        //Creates new objective with old objectives name and criteria
-        buffer = scoreboard.registerNewObjective(objName, criteria);
-
+        //Sets the players scoreboard to this scoreboard
         p.setScoreboard(scoreboard);
     }
 
@@ -327,20 +243,6 @@ public class Scoreboard {
     private void addToExecution(LineExecution execution) {
         int next = executions.keySet().stream().reduce((i, ii) -> i > ii ? i : ii).orElse(-1) + 1;
         executions.put(next, execution);
-    }
-
-    private String getUniqueEntry() {
-        String[] random = {getRandomColor() + "" + getRandomColor()};
-
-        while(scoreboard.getTeams().stream().anyMatch(t -> t.getEntries().stream().anyMatch(e -> e.equals(random[0])))) {
-            random[0] = getRandomColor() + "" + getRandomColor();
-        }
-
-        return random[0];
-    }
-
-    private ChatColor getRandomColor() {
-        return ChatColor.values()[(int) Number.getRandom(1, ChatColor.values().length - 1)];
     }
 
     private Map<Integer, LineExecution> getFinalSet() {
