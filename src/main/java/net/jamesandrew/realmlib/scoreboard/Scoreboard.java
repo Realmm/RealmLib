@@ -24,6 +24,7 @@ public class Scoreboard {
     private LineExecution title;
 
     private final Map<Integer, LineExecution> executions = new HashMap<>();
+    private final Map<Integer, LineExecution> oldExecutions = new HashMap<>();
     private final Set<SetExecution> setExecutions = new HashSet<>();
     private final Set<ScoreboardTeam> teams = new HashSet<>();
 
@@ -198,6 +199,7 @@ public class Scoreboard {
 
         //Get the final sorted set and loop through it
         getFinalSet().forEach((i, e) -> {
+            if (!oldExecutions.isEmpty() && oldExecutions.containsKey(i) && oldExecutions.get(i).execute(p).equals(e.execute(p))) return;
             //Find the team for this index (cached on instantiation)
             ScoreboardTeam sbTeam = teams.stream().filter(s -> s.getIndex() == i).findFirst().orElseThrow(() -> new IllegalArgumentException("No team with index " + i));
             Team team = sbTeam.getTeam();
@@ -224,6 +226,8 @@ public class Scoreboard {
 
             //Updates the objective with the appropriate score and entry
             objective.getScore(entry).setScore(i);
+
+            oldExecutions.put(i, e);
         });
 
         //Sets the players scoreboard to this scoreboard
