@@ -1,5 +1,6 @@
 package net.jamesandrew.realmlib.scoreboard;
 
+import net.jamesandrew.commons.logging.Logger;
 import net.jamesandrew.realmlib.lang.Lang;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
@@ -211,7 +212,7 @@ public class RealmScoreboard {
 
             //Splits the line in half, sets the first half as prefix, second half as suffix, of the appropriate team
             if (toAdd.length() <= 16) {
-                team.setPrefix(toAdd);
+                team.setPrefix(Lang.color(toAdd));
             } else {
                 if (toAdd.length() > 30) {
                     toAdd = StringUtils.substring(toAdd, 0, 30);
