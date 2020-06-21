@@ -1,6 +1,5 @@
 package net.jamesandrew.realmlib.scoreboard;
 
-import net.jamesandrew.commons.logging.Logger;
 import net.jamesandrew.realmlib.lang.Lang;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
@@ -222,7 +221,7 @@ public class RealmScoreboard {
                 char splitCode = sub.charAt(sub.length() - 1);
                 boolean codeSplit = splitCode == ChatColor.COLOR_CHAR;
                 String prefix = StringUtils.substring(toAdd, 0, codeSplit ? 15 : 16);
-                String lastColor = ChatColor.getLastColors(prefix).equals("") ? ChatColor.RESET.toString() : ChatColor.getLastColors(prefix);
+                String lastColor = ChatColor.getLastColors(Lang.color(prefix)).equals("") ? ChatColor.RESET.toString() : ChatColor.getLastColors(Lang.color(prefix));
                 String suffix = StringUtils.substring(toAdd, codeSplit ? 15 : 16, codeSplit ? 31 : 30);
 
                 team.setPrefix(Lang.color(prefix));
