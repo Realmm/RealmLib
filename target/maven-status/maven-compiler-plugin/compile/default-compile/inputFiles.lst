@@ -42,7 +42,7 @@ F:\Dev\Minecraft\RealmLib\src\main\java\net\jamesandrew\realmlib\lang\TextCompon
 F:\Dev\Minecraft\RealmLib\src\main\java\net\jamesandrew\realmlib\inventory\InventoryListener.java
 F:\Dev\Minecraft\RealmLib\src\main\java\net\jamesandrew\realmlib\lang\ClickableText.java
 F:\Dev\Minecraft\RealmLib\src\main\java\net\jamesandrew\realmlib\command\SubCommand.java
-F:\Dev\Minecraft\RealmLib\src\main\java\net\jamesandrew\realmlib\scoreboard\Scoreboard.java
 F:\Dev\Minecraft\RealmLib\src\main\java\net\jamesandrew\realmlib\command\CommandManager.java
+F:\Dev\Minecraft\RealmLib\src\main\java\net\jamesandrew\realmlib\scoreboard\RealmScoreboard.java
 F:\Dev\Minecraft\RealmLib\src\main\java\net\jamesandrew\realmlib\inventory\hotbar\HotBar.java
 F:\Dev\Minecraft\RealmLib\src\main\java\net\jamesandrew\realmlib\register\Register.java

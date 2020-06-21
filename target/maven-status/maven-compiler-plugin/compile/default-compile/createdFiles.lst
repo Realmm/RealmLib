@@ -11,6 +11,7 @@ net\jamesandrew\realmlib\inventory\IconExecution.class
 net\jamesandrew\realmlib\location\LocationSerializer.class
 net\jamesandrew\realmlib\command\PlaceHolderExecution.class
 net\jamesandrew\realmlib\command\CommandNode.class
+net\jamesandrew\realmlib\scoreboard\RealmScoreboard.class
 net\jamesandrew\realmlib\command\CommandExecutionable.class
 net\jamesandrew\realmlib\inventory\hotbar\HotBarIconMoveListener.class
 net\jamesandrew\realmlib\RealmLib.class
@@ -47,4 +48,3 @@ net\jamesandrew\realmlib\inventory\hotbar\HotBarBlockPlaceListener.class
 net\jamesandrew\realmlib\placeholder\ReplacePattern.class
 net\jamesandrew\realmlib\inventory\hotbar\HotBarIcon.class
 net\jamesandrew\realmlib\item\MaxStackSizeInventoryClickListener.class
-net\jamesandrew\realmlib\scoreboard\Scoreboard.class

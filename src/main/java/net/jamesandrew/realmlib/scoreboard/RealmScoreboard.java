@@ -1,5 +1,6 @@
 package net.jamesandrew.realmlib.scoreboard;
 
+import net.jamesandrew.realmlib.lang.Lang;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,7 +15,7 @@ import java.util.*;
  * A wrapper for {@link Bukkit}'s {@link org.bukkit.scoreboard.Scoreboard} class
  * Allows for easier manipulation of the sidebar {@link org.bukkit.scoreboard.Scoreboard}
  */
-public class Scoreboard {
+public class RealmScoreboard {
 
     private final int maxLines = 15;
 
@@ -32,7 +33,7 @@ public class Scoreboard {
      * Create a scoreboard with a certain title
      * @param title The title to set
      */
-    public Scoreboard(String title) {
+    public RealmScoreboard(String title) {
         this(title, new ArrayList<>());
     }
 
@@ -41,7 +42,7 @@ public class Scoreboard {
      * @param p The player to execute the {@link LineExecution}
      * @param title The {@link LineExecution} title to set
      */
-    public Scoreboard(Player p, LineExecution title) {
+    public RealmScoreboard(Player p, LineExecution title) {
         this(title.execute(p));
         this.title = title;
     }
@@ -51,7 +52,7 @@ public class Scoreboard {
      * @param title The title to set
      * @param lines The {@link LineExecution}'s to set
      */
-    public Scoreboard(String title, LineExecution... lines) {
+    public RealmScoreboard(String title, LineExecution... lines) {
         this(title, Arrays.asList(lines));
     }
 
@@ -60,7 +61,7 @@ public class Scoreboard {
      * @param title The title to set
      * @param lines The {@link LineExecution}'s to set
      */
-    public Scoreboard(String title, List<LineExecution> lines) {
+    public RealmScoreboard(String title, List<LineExecution> lines) {
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 
         objective = scoreboard.registerNewObjective("obj", "dummy");
@@ -223,8 +224,8 @@ public class Scoreboard {
                 String lastColor = ChatColor.getLastColors(prefix).equals("") ? ChatColor.RESET.toString() : ChatColor.getLastColors(prefix);
                 String suffix = StringUtils.substring(toAdd, codeSplit ? 15 : 16, codeSplit ? 31 : 30);
 
-                team.setPrefix(prefix);
-                team.setSuffix(codeSplit ? suffix : lastColor + suffix);
+                team.setPrefix(Lang.color(prefix));
+                team.setSuffix(Lang.color(codeSplit ? suffix : lastColor + suffix));
             }
 
             //Updates the objective with the appropriate score and entry
@@ -238,11 +239,11 @@ public class Scoreboard {
     }
 
     /**
-     * Creates an exact copy of this {@link Scoreboard}
-     * @return An exact copy of this {@link Scoreboard}
+     * Creates an exact copy of this {@link RealmScoreboard}
+     * @return An exact copy of this {@link RealmScoreboard}
      */
-    public Scoreboard clone() {
-        Scoreboard scoreboard = new Scoreboard(objective.getDisplayName(), new ArrayList<>(executions.values()));
+    public RealmScoreboard clone() {
+        RealmScoreboard scoreboard = new RealmScoreboard(objective.getDisplayName(), new ArrayList<>(executions.values()));
         scoreboard.setExecutions.addAll(setExecutions);
         return scoreboard;
     }
