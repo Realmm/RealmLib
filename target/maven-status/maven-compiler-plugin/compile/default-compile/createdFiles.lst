@@ -45,6 +45,7 @@ net\jamesandrew\realmlib\item\ItemStackBuilder.class
 net\jamesandrew\realmlib\lang\BasicText.class
 net\jamesandrew\realmlib\item\PlayerSkull.class
 net\jamesandrew\realmlib\inventory\hotbar\HotBarBlockPlaceListener.class
+net\jamesandrew\realmlib\shapes\Cuboid.class
 net\jamesandrew\realmlib\placeholder\ReplacePattern.class
 net\jamesandrew\realmlib\inventory\hotbar\HotBarIcon.class
 net\jamesandrew\realmlib\item\MaxStackSizeInventoryClickListener.class

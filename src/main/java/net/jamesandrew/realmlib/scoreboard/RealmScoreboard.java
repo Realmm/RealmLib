@@ -193,7 +193,7 @@ public class RealmScoreboard {
      * @param p The {@link Player} to update
      */
     public void update(Player p) {
-        if (executions.size() == 0) return;
+        if (executions.size() == 0 && setExecutions.size() == 0) return;
 
         //Updates players title if it can
         if (title != null) objective.setDisplayName(title.execute(p));
@@ -264,7 +264,7 @@ public class RealmScoreboard {
         //Loops through all 'set' lines, if it can and should append to the bottom
         // of the scoreboard, it does, if it shouldn't it simply sets the line
         setExecutions.forEach(e -> {
-            boolean canAppend = e.getIndex() > highest + 1;
+            boolean canAppend = e.getIndex() >= highest + 1;
             if (canAppend) {
                 if (e.shouldAppend()) toAppend.put(e.getIndex(), e.getExecution());
             } else {
@@ -279,8 +279,10 @@ public class RealmScoreboard {
         executions.forEach((i, e) -> pushed.put(i, toSet.getOrDefault(i, e)));
 
         //Reverses the pushed map insertion as scoreboards go from highest(top) -> lowest(bottom), not lowest(top) -> highest(bottom)
-        for (int i = highest; i >= 0; i--) {
-            reversed.put(highest - i, pushed.get(i));
+        if (pushed.size() > 0) {
+            for (int i = highest; i >= 0; i--) {
+                reversed.put(highest - i, pushed.get(i));
+            }
         }
 
         Map<Integer, LineExecution> finalToSet = new HashMap<>();
@@ -290,9 +292,8 @@ public class RealmScoreboard {
         // append by, to make room for the appending lines
         reversed.forEach((i, e) -> finalToSet.put(i + toAppend.size(), e));
 
-
         //Loops through the 'set' lines that should append to bottom of scoreboard
-        for (int x = 0; x <= toAppend.size(); x++) {
+        for (int x = 0; x < toAppend.size(); x++) {
             //Puts the map in descending order, ordered by values, and gets the 'x'th value
             Optional<LineExecution> o = toAppend.descendingMap().values().stream().skip(x).findFirst();
 
@@ -307,6 +308,7 @@ public class RealmScoreboard {
             //Inserts the appended line to the first available slot
             o.ifPresent(l -> finalToSet.put(finalNext, l));
         }
+
         return finalToSet;
     }
 
