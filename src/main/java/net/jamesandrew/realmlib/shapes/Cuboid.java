@@ -3,6 +3,8 @@ package net.jamesandrew.realmlib.shapes;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,7 +28,7 @@ public class Cuboid {
         return loc.getX() >= x1 && loc.getX() <= x2 && loc.getY() >= y1 && loc.getY() <= y2 && loc.getZ() >= z1 && loc.getZ() <= z2;
     }
 
-    public Set<Block> getBlocks() {
+    public Collection<Block> getBlocks() {
         int x1 = Math.min(l1.getBlockX(), l2.getBlockX());
         int y1 = Math.min(l1.getBlockY(), l2.getBlockY());
         int z1 = Math.min(l1.getBlockZ(), l2.getBlockZ());
@@ -43,7 +45,7 @@ public class Cuboid {
                 }
             }
         }
-        return blocks;
+        return Collections.unmodifiableCollection(blocks);
     }
 
 }

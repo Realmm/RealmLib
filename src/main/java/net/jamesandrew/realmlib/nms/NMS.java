@@ -7,7 +7,11 @@ public final class NMS {
     private NMS(){}
 
     public static Class<?> getNMSClass(String name) throws ClassNotFoundException {
-        return Class.forName("net.minecraft.server." + Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3] + "." + name);
+        return Class.forName("net.minecraft.server." + getVersion() + "." + name);
+    }
+
+    public static String getVersion() {
+        return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
     }
 
 }

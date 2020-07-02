@@ -1,6 +1,5 @@
 package net.jamesandrew.realmlib.scoreboard;
 
-import net.jamesandrew.commons.logging.Logger;
 import net.jamesandrew.realmlib.lang.Lang;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
@@ -64,7 +63,6 @@ public class RealmScoreboard {
      */
     public RealmScoreboard(String title, List<LineExecution> lines) {
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-
         objective = scoreboard.registerNewObjective("obj", "dummy");
         objective.setDisplayName(title);
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -124,6 +122,14 @@ public class RealmScoreboard {
             execution = p -> sb.toString();
         }
         addLine(execution);
+    }
+
+    /**
+     * Removes a specific line on a scoreboard
+     * @param index The lines index to remove
+     */
+    public void removeLine(int index) {
+        setExecutions.removeIf(e -> e.getIndex() == index); //doesnt remove properly
     }
 
     /**

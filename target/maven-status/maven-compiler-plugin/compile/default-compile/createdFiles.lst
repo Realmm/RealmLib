@@ -11,6 +11,7 @@ net\jamesandrew\realmlib\inventory\IconExecution.class
 net\jamesandrew\realmlib\location\LocationSerializer.class
 net\jamesandrew\realmlib\command\PlaceHolderExecution.class
 net\jamesandrew\realmlib\command\CommandNode.class
+net\jamesandrew\realmlib\item\Potion.class
 net\jamesandrew\realmlib\scoreboard\RealmScoreboard.class
 net\jamesandrew\realmlib\command\CommandExecutionable.class
 net\jamesandrew\realmlib\inventory\hotbar\HotBarIconMoveListener.class
@@ -42,6 +43,7 @@ net\jamesandrew\realmlib\inventory\Seedable.class
 net\jamesandrew\realmlib\inventory\InventorySize.class
 net\jamesandrew\realmlib\command\CommandManager.class
 net\jamesandrew\realmlib\item\ItemStackBuilder.class
+net\jamesandrew\realmlib\inventory\InventoryUtil.class
 net\jamesandrew\realmlib\lang\BasicText.class
 net\jamesandrew\realmlib\item\PlayerSkull.class
 net\jamesandrew\realmlib\inventory\hotbar\HotBarBlockPlaceListener.class
