@@ -18,9 +18,10 @@ import java.util.*;
 public class RealmScoreboard {
 
     private final int maxLines = 15;
+    private boolean toUpdate = false;
 
     private final org.bukkit.scoreboard.Scoreboard scoreboard;
-    private final Objective objective;
+    private Objective objective;
 
     private LineExecution title;
 
@@ -129,7 +130,9 @@ public class RealmScoreboard {
      * @param index The lines index to remove
      */
     public void removeLine(int index) {
-        setExecutions.removeIf(e -> e.getIndex() == index); //doesnt remove properly
+        if (setExecutions.removeIf(e -> e.getIndex() == index)) {
+            toUpdate = true;
+        }
     }
 
     /**
@@ -200,14 +203,32 @@ public class RealmScoreboard {
      * @param p The {@link Player} to update
      */
     public void update(Player p) {
-        if (executions.size() == 0 && setExecutions.size() == 0) return;
+        if (executions.size() == 0 && setExecutions.size() == 0) {
+            if (p.getScoreboard() != null) remove(p);
+            toUpdate = false;
+            return;
+        }
+
+        if (toUpdate) {
+            String name = objective.getName().equals("obj") ? "obj2" : "obj";
+            String criteria = objective.getCriteria().equals("dummy") ? "dummy2" : "dummy";
+            Objective o = scoreboard.registerNewObjective(name, criteria);
+            if (title == null) {
+                o.setDisplayName(objective.getDisplayName());
+            } else o.setDisplayName(Lang.color(title.execute(p)));
+            o.setDisplaySlot(objective.getDisplaySlot());
+
+            objective.unregister();
+            objective = o;
+            oldExecutions.clear();
+        }
 
         //Updates players title if it can
-        if (title != null) objective.setDisplayName(title.execute(p));
+        if (title != null) objective.setDisplayName(Lang.color(title.execute(p)));
 
         //Get the final sorted set and loop through it
         getFinalSet().forEach((i, e) -> {
-            if (!oldExecutions.isEmpty() && oldExecutions.containsKey(i) && oldExecutions.get(i).execute(p).equals(e.execute(p))) return;
+            if (!oldExecutions.isEmpty() && oldExecutions.containsKey(i) && oldExecutions.get(i).execute(p).equals(e.execute(p)) && !toUpdate) return;
             //Find the team for this index (cached on instantiation)
             ScoreboardTeam sbTeam = teams.stream().filter(s -> s.getIndex() == i).findFirst().orElseThrow(() -> new IllegalArgumentException("No team with index " + i));
             Team team = sbTeam.getTeam();
@@ -244,6 +265,7 @@ public class RealmScoreboard {
 
         //Sets the players scoreboard to this scoreboard
         p.setScoreboard(scoreboard);
+        toUpdate = false;
     }
 
     /**

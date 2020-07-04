@@ -1,149 +1,42 @@
 package net.jamesandrew.realmlib.command;
 
-import net.jamesandrew.commons.container.Container;
-import org.apache.commons.lang.Validate;
 import org.bukkit.command.CommandSender;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Set;
 
-public abstract class CommandNode implements CommandExecutionable {
+public interface CommandNode extends CommandExecutionable {
 
-    private final String node;
-    private String permMessage;
-    private CommandExecution commandExecution;
-    private Set<SubCommand> subCommands = new LinkedHashSet<>();
-    private Set<String> perms = new HashSet<>();
-    private List<CommandNode> chain = new LinkedList<>();
+    String getNode();
 
-    public CommandNode(String node, CommandExecution commandExecution) {
-        this.node = node;
-        this.commandExecution = commandExecution;
-    }
-
-    public String getNode() {
-        return node;
-    }
-
-    void execute(CommandSender sender, String[] args) {
-        commandExecution.onCommand(sender, args);
-    }
+    void execute(CommandSender sender, String[] args);
 
     @Override
-    public void setExecution(CommandExecution commandExecution) {
-        this.commandExecution = commandExecution;
-    }
+    void setExecution(CommandExecution commandExecution);
 
     @Override
-    public CommandExecution getExecution() {
-        return commandExecution;
-    }
+    CommandExecution getExecution();
 
     @Override
-    public boolean isExecutable() {
-        return commandExecution != null;
-    }
+    boolean isExecutable();
 
-    public boolean isChild(String s) {
-        return subCommands.stream().map(SubCommand::getNode).anyMatch(n -> n.equalsIgnoreCase(s));
-    }
+    boolean isChild(String s);
 
-    public SubCommand getChild(String s) {
-        return subCommands.stream().filter(n -> n.getNode().equalsIgnoreCase(s)).findFirst().orElse(null);
-    }
+    SubCommand getChild(String s);
 
-    public List<CommandNode> getParentChain() {
-        return Collections.unmodifiableList(chain);
-    }
+    CommandNode getParent(int index);
 
-    public CommandNode getParent(int index) {
-        return chain.get(index);
-    }
+    CommandNode getParent(String node);
 
-    public CommandNode getParent(String node) {
-        return chain.stream().filter(n -> n.getNode().equalsIgnoreCase(node)).findFirst().orElseThrow(NullPointerException::new);
-    }
+    boolean isParent(int index);
 
-    public boolean isParent(int index) {
-        return getParent(index) != null;
-    }
+    boolean isParent(String node);
 
-    public boolean isParent(String node) {
-        return getParent(node) != null;
-    }
+    Set<SubCommand> getChildren();
 
-    protected void addToParentChain(CommandNode node) {
-        chain.add(node);
-    }
+    void addSubCommands(SubCommand... subCommands);
 
-    protected void addToParentChain(List<CommandNode> nodes) {
-        nodes.forEach(this::addToParentChain);
-    }
+    boolean hasChildren();
 
-    protected void clearParentChain() {
-        chain.clear();
-    }
-
-    public Set<SubCommand> getChildren() {
-        return Collections.unmodifiableSet(subCommands);
-    }
-
-    public void addSubCommands(SubCommand... subCommands) {
-        Optional<SubCommand> contained = Arrays.stream(subCommands).filter(s -> this.subCommands.stream().anyMatch(c -> c.getNode().equalsIgnoreCase(s.getNode()))).findFirst();
-        List<String> nodes = Arrays.stream(subCommands).map(SubCommand::getNode).collect(Collectors.toList());
-        boolean inSet = Container.hasDuplicate(nodes);
-        boolean alreadySet = contained.isPresent() || inSet;
-
-        StringBuilder sb = new StringBuilder();
-        if (inSet) {
-            Map<String, Integer> dupes = Container.getDuplicatesCounted(nodes);
-            dupes.keySet().forEach(s -> sb.append("\'").append(s).append("\'").append(" (").append(dupes.get(s)).append(" times) "));
-        }
-
-        Validate.isTrue(!alreadySet, contained.isPresent() ? "Node \'" + contained.get().getNode() + "\' already registered" :
-                inSet ? "Node/s already registered: " + sb.toString().trim() : "Node already registered");
-        this.subCommands.addAll(Arrays.asList(subCommands));
-    }
-
-    public boolean hasChildren() {
-        return subCommands.size() > 0;
-    }
-
-    public int getAmountOfChildren() {
-        return getChildren().size();
-    }
-
-    public void addPermission(String s) {
-        perms.add(s);
-    }
-
-    public void setPermissionMessage(String message) {
-        this.permMessage = message;
-    }
-
-    protected boolean hasPermMessage() {
-        return this.permMessage != null;
-    }
-
-    protected String getPermMessage() {
-        return permMessage;
-    }
-
-    public void removePermission(String s) {
-        perms.remove(s);
-        if (hasPermMessage()) this.permMessage = null;
-    }
-
-    public boolean hasPermission(String s) {
-        return perms.contains(s);
-    }
-
-    public boolean hasPermissions() {
-        return !perms.isEmpty();
-    }
-
-    public Collection<? extends String> getPermissions() {
-        return Collections.unmodifiableCollection(perms);
-    }
+    int getAmountOfChildren();
 
 }

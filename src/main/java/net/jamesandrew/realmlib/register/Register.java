@@ -32,9 +32,4 @@ public final class Register {
         Bukkit.getPluginManager().callEvent(e);
     }
 
-//    public static void placeholderExpansion(PlaceholderExpansion e) {
-//        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) throw new IllegalArgumentException("Tried to register placeholder expansion while not having installed PlaceholderAPI jar");
-//        e.register();
-//    }
-
 }

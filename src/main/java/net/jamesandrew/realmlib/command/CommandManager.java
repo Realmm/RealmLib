@@ -1,21 +1,22 @@
 package net.jamesandrew.realmlib.command;
 
 import net.jamesandrew.commons.exception.Validator;
-import net.jamesandrew.realmlib.register.Register;
 import org.apache.commons.lang.Validate;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.Bukkit;
+import org.bukkit.command.*;
+import org.bukkit.plugin.SimplePluginManager;
 
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public final class CommandManager implements CommandExecutor, TabCompleter {
 
-    private Set<BaseCommand> baseCommands = new HashSet<>();
-    private static CommandManager manager = new CommandManager();
+    private final Set<BaseCommand> baseCommands = new HashSet<>();
+    private static final CommandManager manager = new CommandManager();
+
+    private CommandManager(){}
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String s, String[] args) {
@@ -49,7 +50,7 @@ public final class CommandManager implements CommandExecutor, TabCompleter {
         return baseCommands.stream().map(CommandNode::getNode).anyMatch(c -> c.equalsIgnoreCase(command));
     }
 
-    public CommandManager get() {
+    public static CommandManager get() {
         return manager;
     }
 
@@ -58,7 +59,19 @@ public final class CommandManager implements CommandExecutor, TabCompleter {
         Validate.isTrue(!manager.containsCommand(command), "Command \'" + command + "\' is already registered");
         Validate.isTrue(!manager.containsBaseCommand(baseCommand), "Command \'" + command + "\' is already registered");
         manager.addBaseCommand(baseCommand);
-        Register.command(manager, command);
+
+        try {
+            if (Bukkit.getPluginManager() instanceof SimplePluginManager) {
+                Field f = SimplePluginManager.class.getDeclaredField("commandMap");
+                f.setAccessible(true);
+                CommandMap commandMap = (CommandMap) f.get(Bukkit.getPluginManager());
+                commandMap.register(baseCommand.getNode(), baseCommand);
+                f.setAccessible(false);
+            }
+
+        } catch(NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
 }

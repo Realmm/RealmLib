@@ -1,35 +1,48 @@
 package net.jamesandrew.realmlib.command;
 
+import net.jamesandrew.commons.container.Container;
 import net.jamesandrew.commons.logging.Logger;
+import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.defaults.BukkitCommand;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class BaseCommand extends CommandNode {
+public class BaseCommand extends BukkitCommand implements CommandNode {
 
-    private final CommandManager manager = new CommandManager();
+    private final String node;
+    private CommandExecution commandExecution;
+    private Set<SubCommand> subCommands = new LinkedHashSet<>();
+    private Set<String> perms = new HashSet<>();
+    private List<CommandNode> chain = new LinkedList<>();
+
     private final Set<String> alias = new HashSet<>();
 
     public BaseCommand(String command, CommandExecution execution) {
-        super(command, execution);
+        super(command);
+        this.node = command;
+        this.commandExecution = execution;
     }
 
     public BaseCommand(String command) {
-        super(command, null);
+        this(command, null);
+    }
+
+    @Override
+    public boolean execute(CommandSender commandSender, String s, String[] args) {
+        return CommandManager.get().onCommand(commandSender, this, s, args);
     }
 
     public void addAlias(String alias) {
         this.alias.add(alias);
+        setAliases(new ArrayList<>(this.alias));
     }
 
     public void addAliases(String... alias) {
         this.alias.addAll(Arrays.asList(alias));
-    }
-
-    public Collection<String> getAliases() {
-        return Collections.unmodifiableCollection(alias);
     }
 
     public boolean hasAlias() {
@@ -41,6 +54,10 @@ public class BaseCommand extends CommandNode {
     }
 
     void callAppropriateCommand(CommandSender sender, String[] args) {
+        if (getPermission() != null && !getPermission().equals("") && !sender.hasPermission(getPermission())) {
+            sender.sendMessage(getPermissionMessage());
+            return;
+        }
         if (args.length == 0) return;
         if (!getNode().equalsIgnoreCase(args[0])) {
             if (!(hasAlias() && isAlias(args[0]))) return;
@@ -136,6 +153,98 @@ public class BaseCommand extends CommandNode {
         }
         cmd.execute(sender, args);
         cmd.clearParentChain();
+    }
+
+    public String getNode() {
+        return node;
+    }
+
+    public void execute(CommandSender sender, String[] args) {
+        commandExecution.onCommand(sender, args);
+    }
+
+    @Override
+    public void setExecution(CommandExecution commandExecution) {
+        this.commandExecution = commandExecution;
+    }
+
+    @Override
+    public CommandExecution getExecution() {
+        return commandExecution;
+    }
+
+    @Override
+    public boolean isExecutable() {
+        return commandExecution != null;
+    }
+
+    public boolean isChild(String s) {
+        return subCommands.stream().map(SubCommand::getNode).anyMatch(n -> n.equalsIgnoreCase(s));
+    }
+
+    public SubCommand getChild(String s) {
+        return subCommands.stream().filter(n -> n.getNode().equalsIgnoreCase(s)).findFirst().orElse(null);
+    }
+
+    public List<CommandNode> getParentChain() {
+        return Collections.unmodifiableList(chain);
+    }
+
+    public CommandNode getParent(int index) {
+        return chain.get(index);
+    }
+
+    public CommandNode getParent(String node) {
+        return chain.stream().filter(n -> n.getNode().equalsIgnoreCase(node)).findFirst().orElseThrow(NullPointerException::new);
+    }
+
+    public boolean isParent(int index) {
+        return getParent(index) != null;
+    }
+
+    public boolean isParent(String node) {
+        return getParent(node) != null;
+    }
+
+    protected void addToParentChain(CommandNode node) {
+        chain.add(node);
+    }
+
+    protected void addToParentChain(List<CommandNode> nodes) {
+        nodes.forEach(this::addToParentChain);
+    }
+
+    protected void clearParentChain() {
+        chain.clear();
+    }
+
+    public Set<SubCommand> getChildren() {
+        return Collections.unmodifiableSet(subCommands);
+    }
+
+    public void addSubCommands(SubCommand... subCommands) {
+        Optional<SubCommand> contained = Arrays.stream(subCommands).filter(s -> this.subCommands.stream().anyMatch(c -> c.getNode().equalsIgnoreCase(s.getNode()))).findFirst();
+        List<String> nodes = Arrays.stream(subCommands).map(SubCommand::getNode).collect(Collectors.toList());
+        boolean inSet = Container.hasDuplicate(nodes);
+        boolean alreadySet = contained.isPresent() || inSet;
+
+        StringBuilder sb = new StringBuilder();
+        if (inSet) {
+            Map<String, Integer> dupes = Container.getDuplicatesCounted(nodes);
+            dupes.keySet().forEach(s -> sb.append("\'").append(s).append("\'").append(" (").append(dupes.get(s)).append(" times) "));
+        }
+
+        Validate.isTrue(!alreadySet, contained.isPresent() ? "Node \'" + contained.get().getNode() + "\' already registered" :
+                inSet ? "Node/s already registered: " + sb.toString().trim() : "Node already registered");
+        this.subCommands.addAll(Arrays.asList(subCommands));
+    }
+
+    public boolean hasChildren() {
+        return subCommands.size() > 0;
+    }
+
+    public int getAmountOfChildren() {
+        return getChildren().size();
     }
 
 }
