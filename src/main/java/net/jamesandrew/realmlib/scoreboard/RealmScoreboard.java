@@ -118,11 +118,45 @@ public class RealmScoreboard {
     public void addBlankLine() {
         StringBuilder sb = new StringBuilder();
         LineExecution execution = p -> "";
-        while(executions.containsValue(execution)) {
+        while(getFinalSet().containsValue(execution)) {
             sb.append(" ");
             execution = p -> sb.toString();
         }
         addLine(execution);
+    }
+
+    /**
+     * Sets a specific line to be blank
+     * @param index The index of the line to modify
+     */
+    public void setBlankLine(int index) {
+        StringBuilder sb = new StringBuilder();
+        LineExecution execution = p -> "";
+        if (setExecutions.stream().anyMatch(s -> {
+            String st = null;
+
+            try {
+                st = s.getExecution().execute(null);
+            } catch (NullPointerException ignored) {}
+
+            if (st == null) return false;
+            boolean isBlankLine = StringUtils.isBlank(st);
+            return s.getIndex() == index && isBlankLine;
+        })) return;
+
+        while(getFinalSet().containsValue(execution)) {
+            sb.append(" ");
+            execution = p -> sb.toString();
+        }
+        setLine(index, execution);
+    }
+
+    /**
+     * Removes specific lines from a scoreboard
+     * @param index The lines index to remove
+     */
+    public void removeLines(int... index) {
+        Arrays.stream(index).forEach(this::removeLine);
     }
 
     /**

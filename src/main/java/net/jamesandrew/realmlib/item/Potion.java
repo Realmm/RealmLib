@@ -63,6 +63,10 @@ public enum Potion {
         return new ItemStack(this == GLASS_BOTTLE ? Material.GLASS_BOTTLE : Material.POTION, amount, (short) id);
     }
 
+    public short getId() {
+        return (short) id;
+    }
+
 
 
 }
