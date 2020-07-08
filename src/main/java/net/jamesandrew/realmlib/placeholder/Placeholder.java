@@ -33,7 +33,7 @@ public final class Placeholder {
     }
 
     public Placeholder setToReplace(Object... objects) {
-        pattern.setToReplace(Arrays.stream(objects).map(Object::toString).toArray(String[]::new));
+        pattern.setToReplace(Arrays.stream(objects).map(o -> o == null ? "null" : o.toString()).toArray(String[]::new));
         return this;
     }
 

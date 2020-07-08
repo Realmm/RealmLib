@@ -112,7 +112,7 @@ public class BaseCommand extends BukkitCommand implements CommandNode {
                 sub.getChildren().stream().filter(SubCommand::hasPlaceHolderExecution).forEach(c -> c.runPlaceHolderExecution(sender, args));
                 Optional<SubCommand> optSub = sub.getChildren().stream()
                         .filter(n -> {
-                            String toCheck = n.hasPlaceHolder() ? ChatColor.stripColor(n.getPlaceHolder()) : n.hasAlias() && n.isAlias(against) ? n.getAlias(against) : n.getNode();
+                            String toCheck = n.hasPlaceHolder() ? ChatColor.stripColor(n.getPlaceHolder()) : n.hasAlias() && n.isAlias(againstInside) ? n.getAlias(againstInside) : n.getNode();
                             return toCheck.equalsIgnoreCase(againstInside);
                         }).findFirst();
                 if (optSub.isPresent()) {

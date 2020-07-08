@@ -2,6 +2,7 @@ package net.jamesandrew.realmlib.command;
 
 import net.jamesandrew.commons.container.Container;
 import net.jamesandrew.commons.exception.Validator;
+import net.jamesandrew.commons.logging.Logger;
 import org.apache.commons.lang.Validate;
 import org.bukkit.command.CommandSender;
 
@@ -33,7 +34,7 @@ public class SubCommand implements CommandNode {
 
     public SubCommand(String placeholder, boolean isPlaceholder) {
         this("");
-        if (isPlaceholder) setPlaceHolder(placeholder);
+        if (isPlaceholder) setPlaceHolder((s, a) -> placeholder);
     }
 
     public SubCommand(String subCommand) {
@@ -46,15 +47,13 @@ public class SubCommand implements CommandNode {
 
     void runPlaceHolderExecution(CommandSender sender, String[] args) {
         String s = placeHolderExecution.executePlaceHolder(sender, args);
+        Logger.debug("setting placeholder to " + s);
         setPlaceHolder(s);
+        Logger.debug("hasPlaceholder: " + hasPlaceHolder());
     }
 
     public void setPlaceHolder(PlaceHolderExecution placeHolderExecution) {
         this.placeHolderExecution = placeHolderExecution;
-    }
-
-    public void setPlaceHolder(String s) {
-        setPlaceHolder((sender, args) -> s);
     }
 
     <T> void setPlaceHolder(T obj) {

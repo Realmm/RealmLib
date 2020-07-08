@@ -38,7 +38,7 @@ public class ReplacePattern {
     }
 
     public String[] getToReplace() {
-        return Arrays.stream(toReplace).map(Object::toString).toArray(String[]::new);
+        return Arrays.stream(toReplace).map(o -> o == null ? "null" : o.toString()).toArray(String[]::new);
     }
 
     public Object[] getObjectsToReplace() {
