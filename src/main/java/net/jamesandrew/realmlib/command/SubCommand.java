@@ -1,6 +1,7 @@
 package net.jamesandrew.realmlib.command;
 
 import net.jamesandrew.commons.container.Container;
+import net.jamesandrew.commons.exception.Validator;
 import org.apache.commons.lang.Validate;
 import org.bukkit.command.CommandSender;
 
@@ -12,9 +13,10 @@ public class SubCommand implements CommandNode {
     private final String node;
     private String permMessage;
     private CommandExecution commandExecution;
-    private Set<SubCommand> subCommands = new LinkedHashSet<>();
-    private Set<String> perms = new HashSet<>();
-    private List<CommandNode> chain = new LinkedList<>();
+    private final Set<SubCommand> subCommands = new LinkedHashSet<>();
+    private final Set<String> perms = new HashSet<>();
+    private final List<CommandNode> chain = new LinkedList<>();
+    private final Set<String> alias = new HashSet<>();
 
     private String placeHolder;
     private PlaceHolderExecution placeHolderExecution;
@@ -22,6 +24,16 @@ public class SubCommand implements CommandNode {
     public SubCommand(String subCommand, CommandExecution execution) {
         this.node = subCommand;
         this.commandExecution = execution;
+    }
+
+    public SubCommand(PlaceHolderExecution placeHolderExecution) {
+        this("");
+        setPlaceHolder(placeHolderExecution);
+    }
+
+    public SubCommand(String placeholder, boolean isPlaceholder) {
+        this("");
+        if (isPlaceholder) setPlaceHolder(placeholder);
     }
 
     public SubCommand(String subCommand) {
@@ -39,6 +51,10 @@ public class SubCommand implements CommandNode {
 
     public void setPlaceHolder(PlaceHolderExecution placeHolderExecution) {
         this.placeHolderExecution = placeHolderExecution;
+    }
+
+    public void setPlaceHolder(String s) {
+        setPlaceHolder((sender, args) -> s);
     }
 
     <T> void setPlaceHolder(T obj) {
@@ -59,6 +75,28 @@ public class SubCommand implements CommandNode {
 
     public boolean hasPlaceHolder() {
         return placeHolder != null;
+    }
+
+    public void addAlias(String alias) {
+        Validator.notContains(alias, new HashSet<>(this.alias));
+        this.alias.add(alias);
+    }
+
+    public void addAliases(String... alias) {
+        this.alias.forEach(a -> Validator.notContains(a, new HashSet<>(Arrays.asList(alias))));
+        this.alias.addAll(Arrays.asList(alias));
+    }
+
+    public boolean hasAlias() {
+        return alias.size() > 0;
+    }
+
+    public boolean isAlias(String s) {
+        return alias.stream().anyMatch(a -> a.equalsIgnoreCase(s));
+    }
+
+    public String getAlias(String s) {
+        return alias.stream().filter(a -> a.equalsIgnoreCase(s)).findFirst().orElseThrow(() -> new IllegalArgumentException("No alias"));
     }
 
     public String getNode() {

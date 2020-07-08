@@ -1,9 +1,11 @@
 package net.jamesandrew.realmlib.command;
 
 import net.jamesandrew.commons.container.Container;
+import net.jamesandrew.commons.exception.Validator;
 import net.jamesandrew.commons.logging.Logger;
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -37,11 +39,18 @@ public class BaseCommand extends BukkitCommand implements CommandNode {
     }
 
     public void addAlias(String alias) {
+        Validator.notContains(alias, new HashSet<>(this.alias));
         this.alias.add(alias);
-        setAliases(new ArrayList<>(this.alias));
+        super.setAliases(new ArrayList<>(this.alias));
+    }
+
+    @Override
+    public Command setAliases(List<String> list) {
+        throw new UnsupportedOperationException("Use #addAlias or #addAliases instead");
     }
 
     public void addAliases(String... alias) {
+        this.alias.forEach(a -> Validator.notContains(a, new HashSet<>(Arrays.asList(alias))));
         this.alias.addAll(Arrays.asList(alias));
     }
 
@@ -51,6 +60,10 @@ public class BaseCommand extends BukkitCommand implements CommandNode {
 
     public boolean isAlias(String s) {
         return alias.stream().anyMatch(a -> a.equalsIgnoreCase(s));
+    }
+
+    public String getAlias(String s) {
+        return alias.stream().filter(a -> a.equalsIgnoreCase(s)).findFirst().orElseThrow(() -> new IllegalArgumentException("No alias"));
     }
 
     void callAppropriateCommand(CommandSender sender, String[] args) {
@@ -82,7 +95,7 @@ public class BaseCommand extends BukkitCommand implements CommandNode {
             Optional<SubCommand> node = getChildren().stream()
                     .filter(n -> {
                         if (n.hasPlaceHolderExecution()) n.runPlaceHolderExecution(sender, args);
-                        String toCheck = n.hasPlaceHolder() ? ChatColor.stripColor(n.getPlaceHolder()) : n.getNode();
+                        String toCheck = n.hasPlaceHolder() ? ChatColor.stripColor(n.getPlaceHolder()) : n.hasAlias() && n.isAlias(against) ? n.getAlias(against) : n.getNode();
                         return toCheck.equalsIgnoreCase(against);
                     }).findFirst();
 
@@ -99,7 +112,7 @@ public class BaseCommand extends BukkitCommand implements CommandNode {
                 sub.getChildren().stream().filter(SubCommand::hasPlaceHolderExecution).forEach(c -> c.runPlaceHolderExecution(sender, args));
                 Optional<SubCommand> optSub = sub.getChildren().stream()
                         .filter(n -> {
-                            String toCheck = n.hasPlaceHolder() ? ChatColor.stripColor(n.getPlaceHolder()) : n.getNode();
+                            String toCheck = n.hasPlaceHolder() ? ChatColor.stripColor(n.getPlaceHolder()) : n.hasAlias() && n.isAlias(against) ? n.getAlias(against) : n.getNode();
                             return toCheck.equalsIgnoreCase(againstInside);
                         }).findFirst();
                 if (optSub.isPresent()) {
@@ -136,13 +149,14 @@ public class BaseCommand extends BukkitCommand implements CommandNode {
 
         if (cmd.hasPlaceHolderExecution()) cmd.runPlaceHolderExecution(sender, args);
 
+        String against = args[args.length - 1];
         if (cmd.hasPlaceHolder()) {
             String replaced = ChatColor.stripColor(cmd.getNode().replace(cmd.getNode(), cmd.getPlaceHolder()));
-            if (!replaced.equalsIgnoreCase(args[args.length - 1])) {
+            if (!replaced.equalsIgnoreCase(against)) {
                 cmd.clearParentChain();
                 return;
             }
-        } else if (!cmd.getNode().equalsIgnoreCase(args[args.length - 1])) {
+        } else if (!(cmd.hasAlias() && cmd.isAlias(against) ? cmd.getAlias(against) : cmd.getNode()).equalsIgnoreCase(against)) {
             cmd.clearParentChain();
             return;
         }
