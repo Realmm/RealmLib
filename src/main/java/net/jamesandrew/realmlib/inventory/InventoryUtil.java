@@ -1,18 +1,19 @@
 package net.jamesandrew.realmlib.inventory;
 
-import net.jamesandrew.commons.logging.Logger;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public final class InventoryUtil {
 
     private InventoryUtil(){}
+
+    public static boolean canAdd(Player p, ItemStack... itemStacks) {
+        return canAdd(p, new HashSet<>(Arrays.asList(itemStacks)));
+    }
 
     public static boolean canAdd(Player p, Material material, int amount, boolean divideByMaxStackSize) {
         int freeSlots = 0;

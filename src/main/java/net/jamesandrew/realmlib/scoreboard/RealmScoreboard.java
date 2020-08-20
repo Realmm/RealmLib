@@ -25,9 +25,9 @@ public class RealmScoreboard {
 
     private LineExecution title;
 
-    private final Map<Integer, LineExecution> executions = new HashMap<>();
-    private final Map<Integer, LineExecution> oldExecutions = new HashMap<>();
-    private final Set<SetExecution> setExecutions = new HashSet<>();
+    final Map<Integer, LineExecution> executions = new HashMap<>();
+    final Map<Integer, LineExecution> oldExecutions = new HashMap<>();
+    final Set<SetExecution> setExecutions = new HashSet<>();
     private final Set<ScoreboardTeam> teams = new HashSet<>();
 
     /**
@@ -75,6 +75,14 @@ public class RealmScoreboard {
         }
 
         lines.forEach(this::addToExecution);
+    }
+
+    /**
+     *
+     * @return The maximum amount of lines this scoreboard can set
+     */
+    public int getMaxLines() {
+        return maxLines;
     }
 
     /**
@@ -317,7 +325,7 @@ public class RealmScoreboard {
         executions.put(next, execution);
     }
 
-    private Map<Integer, LineExecution> getFinalSet() {
+    Map<Integer, LineExecution> getFinalSet() {
         //Get highest key value in executions map
         int highest = executions.keySet().stream().reduce((i, ii) -> i > ii ? i : ii).orElse(0);
 

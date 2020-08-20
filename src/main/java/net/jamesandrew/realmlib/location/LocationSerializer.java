@@ -17,7 +17,7 @@ public final class LocationSerializer {
         String pitch = String.valueOf(location.getPitch());
         String yaw = String.valueOf(location.getYaw());
 
-        return world + split + x + split + y + split + z + split + pitch + split + yaw;
+        return String.join(split, world, x, y, z, pitch, yaw);
     }
 
     public static Location deserialize(String s) {

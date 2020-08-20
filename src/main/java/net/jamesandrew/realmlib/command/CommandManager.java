@@ -24,8 +24,10 @@ public final class CommandManager implements CommandExecutor, TabCompleter {
         String[] command = new String[args.length + 1];
         command[0] = cmd.getName();
         for (int i = 0; i < args.length; i++) command[i+1] = args[i];
-        baseCommands.forEach(c -> c.callAppropriateCommand(sender, command));
-        return true;
+        BaseCommand baseCommand = baseCommands.stream().filter(b -> b.getName().equalsIgnoreCase(cmd.getName())).findFirst().orElse(null);
+        if (baseCommand == null) return true;
+        return baseCommand.callAppropriateCommand(sender, command);
+//        baseCommands.forEach(c -> c.callAppropriateCommand(sender, command));
     }
 
     @Override

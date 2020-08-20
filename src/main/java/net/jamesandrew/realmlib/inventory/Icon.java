@@ -20,7 +20,7 @@ public abstract class Icon implements Seedable, Updateable {
     For a bug to occur, a player would need to have the same inventory panel seed,
     item to have the same slot as the clicked object,
     as well as the exact same seed on the object
-    The minimum chance of that occuring is 1.83 x 10^-9 (about 0.00000000183%)
+    The minimum chance of that occurring is 1.83 x 10^-9 (about 0.00000000183%)
      */
     private final String seed = generateInvisibleSeed(5);
     private final ItemStack item;

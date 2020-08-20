@@ -66,27 +66,28 @@ public class BaseCommand extends BukkitCommand implements CommandNode {
         return alias.stream().filter(a -> a.equalsIgnoreCase(s)).findFirst().orElseThrow(() -> new IllegalArgumentException("No alias"));
     }
 
-    void callAppropriateCommand(CommandSender sender, String[] args) {
+    boolean callAppropriateCommand(CommandSender sender, String[] args) {
         if (getPermission() != null && !getPermission().equals("") && !sender.hasPermission(getPermission())) {
             sender.sendMessage(getPermissionMessage());
-            return;
+            return false;
         }
-        if (args.length == 0) return;
+        if (args.length == 0) return false;
         if (!getNode().equalsIgnoreCase(args[0])) {
-            if (!(hasAlias() && isAlias(args[0]))) return;
+            if (!(hasAlias() && isAlias(args[0]))) return false;
         }
         if (args.length <= 1) {
-            if (!isExecutable()) return;
+            if (!isExecutable()) return false;
             addToParentChain(this);
             execute(sender, args);
             clearParentChain();
+            return true;
         } else {
             if (!hasChildren()) {
-                if (!isExecutable()) return;
+                if (!isExecutable()) return false;
                 addToParentChain(this);
                 execute(sender, args);
                 clearParentChain();
-                return;
+                return true;
             }
 
             int arg = 1;
@@ -134,16 +135,17 @@ public class BaseCommand extends BukkitCommand implements CommandNode {
 
             clearParentChain();
 
-            node.ifPresent(n -> runSubCommandExecution(n, sender, toSend));
+            return node.filter(subCommand -> runSubCommandExecution(subCommand, sender, toSend)).isPresent();
+            //            node.ifPresent(n -> runSubCommandExecution(n, sender, toSend));
         }
     }
 
-    private void runSubCommandExecution(SubCommand cmd, CommandSender sender, String[] args) {
+    private boolean runSubCommandExecution(SubCommand cmd, CommandSender sender, String[] args) {
         if (cmd.hasPermissions()) {
             if (!cmd.getPermissions().stream().allMatch(sender::hasPermission) && !(sender instanceof ConsoleCommandSender)) {
                 if (cmd.hasPermMessage()) Logger.log(cmd.getPermMessage());
                 cmd.clearParentChain();
-                return;
+                return true;
             }
         }
 
@@ -154,19 +156,20 @@ public class BaseCommand extends BukkitCommand implements CommandNode {
             String replaced = ChatColor.stripColor(cmd.getNode().replace(cmd.getNode(), cmd.getPlaceHolder()));
             if (!replaced.equalsIgnoreCase(against)) {
                 cmd.clearParentChain();
-                return;
+                return false;
             }
         } else if (!(cmd.hasAlias() && cmd.isAlias(against) ? cmd.getAlias(against) : cmd.getNode()).equalsIgnoreCase(against)) {
             cmd.clearParentChain();
-            return;
+            return false;
         }
 
         if (!cmd.isExecutable()) {
             cmd.clearParentChain();
-            return;
+            return false;
         }
         cmd.execute(sender, args);
         cmd.clearParentChain();
+        return true;
     }
 
     public String getNode() {
