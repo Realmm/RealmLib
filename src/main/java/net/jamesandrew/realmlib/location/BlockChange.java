@@ -1,6 +1,9 @@
 package net.jamesandrew.realmlib.location;
 
+import net.minecraft.server.v1_8_R3.BlockPosition;
+import net.minecraft.server.v1_8_R3.IBlockData;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.material.MaterialData;
 
 public class BlockChange implements Change {
@@ -32,14 +35,13 @@ public class BlockChange implements Change {
 
     @Override
     public void change(Changer l) {
-        throw new UnsupportedOperationException();
-//        final net.minecraft.server.v1_8_R3.World w = ((CraftWorld) l.getWorld()).getHandle();
-//        final net.minecraft.server.v1_8_R3.Chunk chunk = w.getChunkAt(blockVector.getX() >> 4, blockVector.getZ() >> 4);
-//
-//        final BlockPosition bp = new BlockPosition(blockVector.getX(), blockVector.getY(), blockVector.getZ());
-//        final int combined = materialData.getItemTypeId() + (materialData.getData() << 12);
-//        final IBlockData ibd = net.minecraft.server.v1_8_R3.Block.getByCombinedId(combined);
-//        w.setTypeAndData(bp, ibd, 2);
-//        chunk.a(bp, ibd);
+        final net.minecraft.server.v1_8_R3.World w = ((CraftWorld) l.getWorld()).getHandle();
+        final net.minecraft.server.v1_8_R3.Chunk chunk = w.getChunkAt(blockVector.getX() >> 4, blockVector.getZ() >> 4);
+
+        final BlockPosition bp = new BlockPosition(blockVector.getX(), blockVector.getY(), blockVector.getZ());
+        final int combined = materialData.getItemTypeId() + (materialData.getData() << 12);
+        final IBlockData ibd = net.minecraft.server.v1_8_R3.Block.getByCombinedId(combined);
+        w.setTypeAndData(bp, ibd, 2);
+        chunk.a(bp, ibd);
     }
 }
