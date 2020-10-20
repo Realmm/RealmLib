@@ -10,14 +10,14 @@ import org.bukkit.inventory.meta.SkullMeta;
 public class PlayerSkull extends ItemStack {
 
     public PlayerSkull(OfflinePlayer p) {
-        super(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+        super(Material.LEGACY_SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
         SkullMeta meta = (SkullMeta) getItemMeta();
         meta.setOwner(p.getName());
         setItemMeta(meta);
     }
 
     public PlayerSkull(Player p) {
-        super(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+        super(Material.LEGACY_SKULL_ITEM        , 1, (short) SkullType.PLAYER.ordinal());
         SkullMeta meta = (SkullMeta) getItemMeta();
         meta.setOwner(p.getName());
         setItemMeta(meta);

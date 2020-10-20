@@ -19,7 +19,7 @@ public class ItemStackBuilder {
     private DyeColor dyeColor;
     private List<String> lore;
     private String name;
-    private final Material[] colored = {GLASS, INK_SACK, STAINED_GLASS_PANE, STAINED_GLASS, STAINED_CLAY, WOOL};
+    private final Material[] colored = {GLASS, INK_SAC, GLASS_PANE, GLASS, CLAY, LEGACY_WOOL};
 
     public ItemStackBuilder(Material material) {
         this.m = material;
@@ -68,7 +68,7 @@ public class ItemStackBuilder {
         i.setAmount(amount);
 
         if (isColorable()) {
-            if (m == INK_SACK) {
+            if (m == INK_SAC) {
                 i.setDurability(dyeColor.getDyeData());
             } else i.setDurability(dyeColor.getWoolData());
         }
