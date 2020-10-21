@@ -23,7 +23,7 @@ public final class InventoryListener implements Listener {
 
         paginators.stream().filter(Paginator::hasPanels).forEach(p ->
             p.getPanels().forEach(panel -> {
-                String currentTitle = e.getInventory().getTitle();
+                String currentTitle = e.getView().getTitle();
                 if (!panel.getSeededTitle().equals(currentTitle)) return;
                 e.setCancelled(true);
                 panel.getIcons().stream().filter(Objects::nonNull)
