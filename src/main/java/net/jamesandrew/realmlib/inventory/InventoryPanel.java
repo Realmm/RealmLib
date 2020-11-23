@@ -29,6 +29,12 @@ public class InventoryPanel implements Seedable, Updateable {
         setPaginator(paginator);
     }
 
+    public Collection<ItemStack> getItemStacks() {
+        Validate.notNull(paginator, "Paginator not set on InventoryPanel");
+        Validate.notNull(inventory, "Inventory not created");
+        return Arrays.asList(inventory.getContents());
+    }
+
     public void open(Player p) {
         Validate.notNull(paginator, "Paginator not set on InventoryPanel");
         Validate.notNull(inventory, "Inventory not created");
