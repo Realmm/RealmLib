@@ -5,6 +5,7 @@ import net.jamesandrew.commons.reflection.Reflect;
 import net.jamesandrew.realmlib.inventory.InventoryListener;
 import net.jamesandrew.realmlib.inventory.hotbar.HotBarBlockPlaceListener;
 import net.jamesandrew.realmlib.inventory.hotbar.HotBarIconMoveListener;
+import net.jamesandrew.realmlib.inventory.hotbar.HotBarInteractEntityListener;
 import net.jamesandrew.realmlib.inventory.hotbar.HotBarInteractListener;
 import net.jamesandrew.realmlib.inventory.hotbar.IconDropListener;
 import net.jamesandrew.realmlib.item.MaxStackSizeInventoryClickListener;
@@ -79,6 +80,7 @@ public abstract class RealmLib extends JavaPlugin {
                 new IconDropListener(),
                 new InventoryListener(),
                 new HotBarInteractListener(),
+                new HotBarInteractEntityListener(),
                 new HotBarIconMoveListener(),
                 new HotBarBlockPlaceListener(),
                 new MaxStackSizeInventoryClickListener()

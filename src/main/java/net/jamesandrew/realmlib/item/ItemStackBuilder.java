@@ -2,13 +2,16 @@ package net.jamesandrew.realmlib.item;
 
 import net.jamesandrew.commons.logging.Logger;
 import net.jamesandrew.realmlib.lang.Lang;
+import net.jamesandrew.realmlib.nbt.NBT;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.bukkit.Material.*;
 
@@ -20,6 +23,7 @@ public class ItemStackBuilder {
     private List<String> lore;
     private String name;
     private final Material[] colored = {GLASS, INK_SACK, STAINED_GLASS_PANE, STAINED_GLASS, STAINED_CLAY, WOOL};
+    private final Map<String, String> nbtTags = new HashMap<>();
 
     public ItemStackBuilder(Material material) {
         this.m = material;
@@ -37,6 +41,11 @@ public class ItemStackBuilder {
 
     public ItemStackBuilder setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public ItemStackBuilder addNBTTag(String key, String tag) {
+        nbtTags.put(key, tag);
         return this;
     }
 
@@ -64,7 +73,8 @@ public class ItemStackBuilder {
     }
 
     public ItemStack build() {
-        ItemStack i = new ItemStack(m, amount);
+        ItemStack[] iArray = {new ItemStack(m, amount)};
+        ItemStack i = iArray[0];
         i.setAmount(amount);
 
         if (isColorable()) {
@@ -79,6 +89,10 @@ public class ItemStackBuilder {
         meta.setLore(lore);
         i.setItemMeta(meta);
 
-        return i;
+        iArray[0] = i;
+
+        nbtTags.forEach((key, tag) -> iArray[0] = NBT.addTag(iArray[0], key, tag));
+
+        return iArray[0];
     }
 }

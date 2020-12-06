@@ -40,6 +40,10 @@ public class HotBar {
         icons.stream().filter(i -> (i.getSlot() < 9 && i.getSlot() >= 0)).forEach(i -> p.getInventory().setItem(i.getSlot(), i.getItem()));
     }
 
+    public void setIcon(HotBarIcon icon, int slot) {
+        icons.stream().filter(i -> i.getSlot() == slot).forEach(i -> i = icon);
+    }
+
     public Collection<? extends HotBarIcon> getIcons() {
         return icons;
     }

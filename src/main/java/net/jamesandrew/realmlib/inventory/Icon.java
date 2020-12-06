@@ -1,5 +1,6 @@
 package net.jamesandrew.realmlib.inventory;
 
+import net.jamesandrew.realmlib.nbt.NBT;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -23,7 +24,7 @@ public abstract class Icon implements Seedable, Updateable {
     The minimum chance of that occurring is 1.83 x 10^-9 (about 0.00000000183%)
      */
     private final String seed = generateInvisibleSeed(5);
-    private final ItemStack item;
+    private ItemStack item;
 
     public Icon(ItemStack item, IconExecution execution) {
         Validate.notNull(item, "Item cannot be null");
@@ -39,6 +40,10 @@ public abstract class Icon implements Seedable, Updateable {
     }
 
 //    public abstract Class<? extends Icon> clone();
+
+    public void setItem(ItemStack item) {
+        this.item = item;
+    }
 
     public ItemStack getItem() {
         return item.clone();

@@ -3,13 +3,18 @@ package net.jamesandrew.realmlib.inventory.hotbar;
 import net.jamesandrew.commons.manager.ManagedHashSet;
 import net.jamesandrew.realmlib.inventory.Icon;
 import net.jamesandrew.realmlib.inventory.IconExecution;
+import net.jamesandrew.realmlib.item.ItemStackBuilder;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Optional;
 
 public class HotBarIcon extends Icon {
 
     private int slot = -1;
     private boolean canRemove = false;
+    private Entity clicked;
     private ManagedHashSet<HotBar> hotBarManagedHashSet = new ManagedHashSet<>();
 
     public HotBarIcon(ItemStack item, IconExecution execution) {
@@ -59,6 +64,19 @@ public class HotBarIcon extends Icon {
 
     public void setCanRemove(boolean canRemove) {
         this.canRemove = canRemove;
+    }
+
+    public void setItemStack(ItemStack itemStack) {
+        super.setItem(itemStack);
+    }
+
+    void setClickedEntity(Entity e) {
+        clicked = e;
+    }
+
+    public Optional<Entity> getClickedEntity() {
+        if (clicked == null) return Optional.empty();
+        return Optional.of(clicked);
     }
 
 }

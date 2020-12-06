@@ -3,6 +3,8 @@ package net.jamesandrew.realmlib.nbt;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
+
 public final class NBT {
 
     private NBT(){}
@@ -24,6 +26,10 @@ public final class NBT {
 
     public static boolean hasTag(ItemStack i, String key) {
         return new NBTItem(i).hasKey(key);
+    }
+
+    public static Collection<String> getTags(ItemStack i) {
+        return new NBTItem(i).getKeys();
     }
 
 }
